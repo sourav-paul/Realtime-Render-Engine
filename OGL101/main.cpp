@@ -1,6 +1,8 @@
 #include<GL/glew.h>
 #include<GLFW/glfw3.h>
 
+#include<direct.h>
+
 #include <stdio.h>  
 #include <stdlib.h>  
 
@@ -39,7 +41,7 @@ int main(void)
 	GLFWwindow* window;
 
 	//Create a window and create its OpenGL context  
-	window = glfwCreateWindow(640, 480, "Render Engine", NULL, NULL);
+	window = glfwCreateWindow(1280, 720, "Render Engine", NULL, NULL);
 
 	//If the window couldn't be created  
 	if (!window)
@@ -66,7 +68,7 @@ int main(void)
 	}
 
 	//Set a background color  
-	glClearColor(0.0f, 0.0f, 1.0f, 0.0f);
+	glClearColor(0.2f, 0.2f, 0.2f, 0.0f);
 
 	//Main Loop  
 	do
