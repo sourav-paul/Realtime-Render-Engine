@@ -1,98 +1,45 @@
-#include<GL/glew.h>
-#include<GLFW/glfw3.h>
+#include <GL/glew.h> // include GLEW and new version of GL on Windows
+#include <GLFW/glfw3.h> // GLFW helper library
+#include <stdio.h>
 
-#include<direct.h>
-
-#include <stdio.h>  
-#include <stdlib.h>  
-
-//Define an error callback  
-static void error_callback(int error, const char* description)
-{
-	fputs(description, stderr);
-	_fgetchar();
-}
-
-//Define the key input callback  
-static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
-{
-	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-		glfwSetWindowShouldClose(window, GL_TRUE);
-}
-
-int main(void)
-{
-	//Set the error callback  
-	glfwSetErrorCallback(error_callback);
-
-	//Initialize GLFW  
-	if (!glfwInit())
-	{
-		exit(EXIT_FAILURE);
+int main() {
+	// start GL context and O/S window using the GLFW helper library
+	if (!glfwInit()) {
+		fprintf(stderr, "ERROR: could not start GLFW3\n");
+		return 1;
 	}
 
-	//Set the GLFW window creation hints - these are optional  
-	//glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3); //Request a specific OpenGL version  
-	//glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3); //Request a specific OpenGL version  
-	//glfwWindowHint(GLFW_SAMPLES, 4); //Request 4x antialiasing  
-	//glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  
+	// uncomment these lines if on Apple OS X
+	/*glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);*/
 
-	//Declare a window object  
-	GLFWwindow* window;
-
-	//Create a window and create its OpenGL context  
-	window = glfwCreateWindow(1280, 720, "Render Engine", NULL, NULL);
-
-	//If the window couldn't be created  
-	if (!window)
-	{
-		fprintf(stderr, "Failed to open GLFW window.\n");
+	GLFWwindow* window = glfwCreateWindow(1280, 720, "Render Engine", NULL, NULL);
+	if (!window) {
+		fprintf(stderr, "ERROR: could not open window with GLFW3\n");
 		glfwTerminate();
-		exit(EXIT_FAILURE);
+		return 1;
 	}
-
-	//This function makes the context of the specified window current on the calling thread.   
 	glfwMakeContextCurrent(window);
 
-	//Sets the key callback  
-	glfwSetKeyCallback(window, key_callback);
+	// start GLEW extension handler
+	glewExperimental = GL_TRUE;
+	glewInit();
 
-	//Initialize GLEW  
-	GLenum err = glewInit();
+	// get version info
+	const GLubyte* renderer = glGetString(GL_RENDERER); // get renderer string
+	const GLubyte* version = glGetString(GL_VERSION); // version as a string
+	printf("Renderer: %s\n", renderer);
+	printf("OpenGL version supported %s\n", version);
 
-	//If GLEW hasn't initialized  
-	if (err != GLEW_OK)
-	{
-		fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
-		return -1;
-	}
+	// tell GL to only draw onto a pixel if the shape is closer to the viewer
+	glEnable(GL_DEPTH_TEST); // enable depth-testing
+	glDepthFunc(GL_LESS); // depth-testing interprets a smaller value as "closer"
 
-	//Set a background color  
-	glClearColor(0.2f, 0.2f, 0.2f, 0.0f);
+						  /* OTHER STUFF GOES HERE NEXT */
 
-	
-
-	//Main Loop  
-	do
-	{
-		//Clear color buffer  
-		glClear(GL_COLOR_BUFFER_BIT);
-
-		//glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
-		glDrawArrays(GL_TRIANGLES, 0, 3);
-
-		//Swap buffers  
-		glfwSwapBuffers(window);
-		//Get and organize events, like keyboard and mouse input, window resizing, etc...  
-		glfwPollEvents();
-
-	} //Check if the ESC key had been pressed or if the window had been closed  
-	while (!glfwWindowShouldClose(window));
-
-	//Close OpenGL window and terminate GLFW  
-	glfwDestroyWindow(window);
-	//Finalize and clean up GLFW  
+						  // close GL context and any other GLFW resources
 	glfwTerminate();
-
-	exit(EXIT_SUCCESS);
+	return 0;
 }
